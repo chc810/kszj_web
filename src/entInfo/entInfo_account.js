@@ -38,8 +38,9 @@ var AccountInfoTab = React.createClass({
       <div>
         <h5>平台账户</h5>
         <div>当前服务模式：{accountType}
+          <Button bsStyle="default">测试</Button>
           <OverlayTrigger placement="bottom" overlay={toolTip}>
-            <Button bsStyle="default">测试</Button>
+            <i className="iconfont">&#xe619;</i>
           </OverlayTrigger>
         </div>
         <div>开始时间：{this.state.startTime}</div>
