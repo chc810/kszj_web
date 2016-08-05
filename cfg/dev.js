@@ -40,4 +40,12 @@ config.module.loaders.push({
   )
 });
 
+config.module.loaders.push({
+  test: /\.(html)$/,
+  loader: 'file?name=[name].[ext]',
+  include: [].concat(
+    config.additionalPaths,
+    [ path.join(__dirname, '/../src') ]
+  )
+});
 module.exports = config;
