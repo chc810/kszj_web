@@ -9,13 +9,23 @@ var $ = require('../js/jquery-1.11.1.min.js');
 var Tooltip = bootstrap.Tooltip;
 var Button = bootstrap.Button;
 var OverlayTrigger = bootstrap.OverlayTrigger;
+var Modal = bootstrap.Modal;
+var FormGroup = bootstrap.FormGroup;
+var Radio = bootstrap.Radio;
+var Form = bootstrap.Form;
+var Col = bootstrap.Col;
+var FormControl = bootstrap.FormControl;
+var Row = bootstrap.Row;
+//
+var commonComponents = require("../common/commonComponents.js");
+var OneLine = commonComponents.OneLine;
 
 //按钮后面跟上提示的组件
 var ButtonWithTip = React.createClass({
   render : function() {
     var tip = <Tooltip id="ttip">{this.props.tipContent}</Tooltip>;
     return <span>
-        <Button bsStyle="default">{this.props.buttonContent}</Button>
+        <Button bsStyle="default" onClick={this.props.onClick}>{this.props.buttonContent}</Button>
         <OverlayTrigger placement="bottom" overlay={tip}>
           <i className="iconfont">&#xe619;</i>
         </OverlayTrigger>
@@ -42,12 +52,27 @@ var AuthButton  = React.createClass({
 
 //操作按钮组
 var ControllerButtons = React.createClass({
+
+  getInitialState : function() {
+    return {
+      showApplyCommercialModal : false
+    };
+  },
+  showApplyCommercialModal  : function() {
+    this.setState({showApplyCommercialModal : true});
+  },
+
+  closeApplyCommercialModal : function() {
+    this.setState({showApplyCommercialModal : false});
+  },
+
   render : function() {
     var ret;
     if (this.props.data.packageType == "0") {
       //试用
       ret = <span>
-       <ButtonWithTip tipContent={"商用企业可在,业务系统永久免费试用。。。"} buttonContent={"申请商用"}/>
+       <ButtonWithTip tipContent={"商用企业可在,业务系统永久免费试用。。。"} buttonContent={"申请商用"} onClick={this.showApplyCommercialModal}/>
+        <ApplyCommercial showModal={this.state.showApplyCommercialModal} closeModal={this.closeApplyCommercialModal}/>
         <AuthButton data={this.props.data}/>
       </span>;
     } else {
@@ -107,8 +132,74 @@ var TrialAccountInfo = React.createClass({
   }
 });
 
+//申请商用组件
+var ApplyCommercial = React.createClass({
+
+  getInitialState : function() {
+    return {
+      packageType : "0"
+    };
+  },
+
+  handlePackageTypeClick : function(e) {
+    this.setState({packageType:e.target.value});
+  },
+
+  render : function() {
+    return (
+      <Modal show={this.props.showModal} onHide={this.props.closeModal} backdrop={"static"}>
+        <Modal.Header closeButton>
+          <Modal.Title>升级为商用用户</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{maxHeight:"700px"}}>
+          <FormGroup>
+            <Radio name="theRadio" checked={this.state.packageType == "0"} value="0" onChange={this.handlePackageTypeClick}>
+              企业版，1万元/年，10个（含10个）坐席以下，赠送百度信誉，超出1个坐席4800/年
+            </Radio>
+
+            <Radio name="theRadio" checked={this.state.packageType == "1"} value="1" onChange={this.handlePackageTypeClick}>
+              基础版，700元/月/坐席，超出1个坐席700元/月
+            </Radio>
+
+            <Radio name="theRadio" checked={this.state.packageType == "2"} value="2" onChange={this.handlePackageTypeClick}>
+              标准版，4800元/年/坐席，超出1个坐席4800/年
+            </Radio>
+          </FormGroup >
+          <OneLine/>
+          <div className="row-fluid">
+            <div className="span2">坐席数：</div>
+            <div className="span10"> <FormControl type="number" placeholder="10" /> 个</div>
+          </div>
+          <div className="row-fluid">
+            <div className="span2">开通时长：</div>
+            <div className="span10"><FormControl type="number" placeholder="1" /> 年</div>
+          </div>
+          <OneLine/>
+          <h5>费用计算</h5>
+          <div className="row-fluid">
+            <div className="span2">坐席个数：</div>
+            <div className="span10"> 2 个</div>
+          </div>
+          <div className="row-fluid">
+            <div className="span2">开通时长：</div>
+            <div className="span10"> 1 年</div>
+          </div>
+          <div className="row-fluid">
+            <div className="span2">总计费用：</div>
+            <div className="span10"> ￥ 1333.00 元</div>
+          </div>
+          <Button>在线支付</Button>
+          <Button>取消</Button>
+          <OneLine/>
+          <div>ddfwer</div>
+        </Modal.Body>
+      </Modal>);
+  }
+});
 
 
+
+//账户信息组件
 var AccountInfoTab = React.createClass({
   getInitialState : function() {
       return this.getData();
@@ -143,6 +234,7 @@ var AccountInfoTab = React.createClass({
         <h5>平台账户</h5>
         {accont}
       </div>
+
     );
   }
 });
