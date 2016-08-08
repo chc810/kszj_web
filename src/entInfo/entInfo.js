@@ -18,7 +18,10 @@ var Button = bootstrap.Button;
 var Tabs = bootstrap.Tabs;
 var Tab = bootstrap.Tab;
 
-
+var constants = {
+  appCtx : "http://10.130.15.14:8080/bdcd",
+  entInfoUrl : "/entInfo/findInfo.do"
+};
 
 var AppComponent = React.createClass({
 	getInitialState : function() {
@@ -35,7 +38,7 @@ var AppComponent = React.createClass({
     return (
       <Tabs activeKey={this.state.key} onSelect={this.handleSelect} id="controlled-tab">
 	    <Tab eventKey={1} title="账户管理">
-        <AccountInfoTab />
+        <AccountInfoTab constants={constants}/>
       </Tab>
 	    <Tab eventKey={2} title="企业信息">Tab 2 content</Tab>
 	    <Tab eventKey={3} title="财务流水">Tab 3 content</Tab>

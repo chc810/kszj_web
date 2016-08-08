@@ -12,13 +12,11 @@ var OverlayTrigger = bootstrap.OverlayTrigger;
 var Modal = bootstrap.Modal;
 var FormGroup = bootstrap.FormGroup;
 var Radio = bootstrap.Radio;
-var Form = bootstrap.Form;
-var Col = bootstrap.Col;
 var FormControl = bootstrap.FormControl;
-var Row = bootstrap.Row;
 //
 var commonComponents = require("../common/commonComponents.js");
 var OneLine = commonComponents.OneLine;
+var UploadFile = commonComponents.UploadFile;
 
 //按钮后面跟上提示的组件
 var ButtonWithTip = React.createClass({
@@ -35,10 +33,28 @@ var ButtonWithTip = React.createClass({
 
 //企业审核按钮组件
 var AuthButton  = React.createClass({
+  getInitialState : function() {
+    return {
+      packageType : "0",
+      showAuthModal : false
+    };
+  },
+
+  handleAuthClick : function(e) {
+    this.setState({showAuthModal:true});
+  },
+
+  closeAuthModal : function() {
+    this.setState({showAuthModal:false});
+  },
+
   render : function() {
     var authContent;
     if (this.props.data.authType == "0") {
-      authContent = <ButtonWithTip tipContent={"升级为认证版后，业务系统永久免费试用。。。"} buttonContent={"企业认证"}/>;
+      authContent = (<span>
+        <ButtonWithTip tipContent={"升级为认证版后，业务系统永久免费试用。。。"} buttonContent={"企业认证"} onClick={this.handleAuthClick}/>
+        <EntAuth showModal={this.state.showAuthModal} closeModal={this.closeAuthModal}/>
+        </span>);
     } else if (this.props.data.authType == "1") {
       authContent = <a href="#">企业认证审核中</a>;
     } else if (this.props.data.authType == "2") {
@@ -197,6 +213,36 @@ var ApplyCommercial = React.createClass({
   }
 });
 
+//企业认证组件
+var EntAuth = React.createClass({
+  Constants : {
+    picUrl : null,
+    buttonName : "上传文件",
+    postUrl : "http://10.130.29.43:8180/upload/WeixinFileUpload"
+  },
+
+  render : function() {
+    return (
+      <Modal show={this.props.showModal} onHide={this.props.closeModal} backdrop={"static"}>
+        <Modal.Header closeButton>
+          <Modal.Title>升级为认证用户</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{maxHeight:"700px"}}>
+          <div className="row-fluid">
+            <div className="span2">公司名称：</div>
+            <div className="span10"> <FormControl type="text" placeholder="须和工商注册信息一致" /></div>
+          </div>
+          <div className="row-fluid">
+            <div className="span2">企业经营执照扫描件：</div>
+            <UploadFile data={this.Constants}/>
+          </div>
+          <Button>在线支付</Button>
+          <Button>取消</Button>
+        </Modal.Body>
+      </Modal>);
+  }
+
+});
 
 
 //账户信息组件
@@ -207,10 +253,34 @@ var AccountInfoTab = React.createClass({
 
   getData : function() {
     //TODO ajax获取后台数据
+   /* var ret = {};
+    console.info(this.props);
+    $.ajax({
+      url : this.props.constants.appCtx + this.props.constants.entInfoUrl,
+      type : "post",
+      dataType : "json",
+      cache : false,
+      data : {},
+      async : false, // 同步加载
+      success : function(data) {
+        if (data.success) {
+          var obj = data.obj;
+          ret.packageType = obj.packageuse.userType;   //套餐类型
 
+          console.info(data);
+        } else {
+          // TODO 查询失败
+          alert(data.msg);
+        }
+      },
+      error : function() {
+        // TODO 查询失败
+        alert("查询企业信息失败！");
+      }
+    });*/
     return {
       packageType : "0",
-      authType : "3",         //0: 未提交资料， 1：审核中，2：审核失败，3：审核成功
+      authType : "0",         //0: 未提交资料， 1：审核中，2：审核失败，3：审核成功
       startTime : "2016-09-05",
       endTime : "2016-09-20",
       currentAgentCount : 1,
