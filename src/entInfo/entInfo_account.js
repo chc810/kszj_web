@@ -182,7 +182,7 @@ var ApplyCommercial = React.createClass({
           </div>
           <div className="row-fluid">
             <div className="span2">开通时长：</div>
-            <div className="span10"> 1 年</div>
+            <div className="span10"> 2 年</div>
           </div>
           <div className="row-fluid">
             <div className="span2">总计费用：</div>
