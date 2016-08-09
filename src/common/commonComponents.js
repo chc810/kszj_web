@@ -32,8 +32,8 @@ var UploadFile = React.createClass({
   },
 
   handleUploadSuccess : function(data) {
-    console.info(data);
     this.setState({picUrl: data.zoomImageUrl});
+    this.props.data.handleSuccess(data);
   },
 
   checkType : function(obj,flag) {

@@ -49,20 +49,23 @@ var AuthButton  = React.createClass({
   },
 
   render : function() {
-    var authContent;
-    if (this.props.data.authType == "0") {
-      authContent = (<span>
-        <ButtonWithTip tipContent={"升级为认证版后，业务系统永久免费试用。。。"} buttonContent={"企业认证"} onClick={this.handleAuthClick}/>
+    return (
+      <span>
+        {(function(){
+          if (this.props.data.authType == "0") {
+            return ( <ButtonWithTip tipContent={"升级为认证版后，业务系统永久免费试用。。。"} buttonContent={"企业认证"} onClick={this.handleAuthClick}/>);
+          }  else if (this.props.data.authType == "1") {
+            return <a onClick={this.handleAuthClick} style={{cursor:"pointer"}}>企业认证审核中</a>;
+          } else if (this.props.data.authType == "2") {
+            return <a onClick={this.handleAuthClick} style={{cursor:"pointer",color:"red"}}>企业认证审核失败</a>;
+          } else if (this.props.data.authType == "3") {
+            return <a onClick={this.handleAuthClick} style={{cursor:"pointer"}}>资质信息</a>;
+          }
+        }.bind(this))()}
         <EntAuth showModal={this.state.showAuthModal} closeModal={this.closeAuthModal}/>
-        </span>);
-    } else if (this.props.data.authType == "1") {
-      authContent = <a href="#">企业认证审核中</a>;
-    } else if (this.props.data.authType == "2") {
-      authContent = <a href="#">企业认证审核失败</a>;
-    } else if (this.props.data.authType == "3") {
-      authContent = <a href="#">资质信息</a>;
-    }
-    return authContent;
+      </span>
+    );
+
   }
 });
 
@@ -218,7 +221,10 @@ var EntAuth = React.createClass({
   Constants : {
     picUrl : null,
     buttonName : "上传文件",
-    postUrl : "http://10.130.29.43:8180/upload/WeixinFileUpload"
+    postUrl : "http://10.130.29.43:8180/upload/WeixinFileUpload",
+    handleSuccess : function(data) {
+      console.info(data);
+    }
   },
 
   render : function() {
@@ -229,15 +235,15 @@ var EntAuth = React.createClass({
         </Modal.Header>
         <Modal.Body style={{maxHeight:"700px"}}>
           <div className="row-fluid">
-            <div className="span2">公司名称：</div>
-            <div className="span10"> <FormControl type="text" placeholder="须和工商注册信息一致" /></div>
+            <div className="span4">公司名称：</div>
+            <div className="span8"> <FormControl type="text" placeholder="须和工商注册信息一致" /></div>
           </div>
           <div className="row-fluid">
-            <div className="span2">企业经营执照扫描件：</div>
-            <UploadFile data={this.Constants}/>
+            <div className="span4">企业经营执照扫描件：</div>
+            <div className="span8"><UploadFile data={this.Constants} /></div>
           </div>
-          <Button>在线支付</Button>
-          <Button>取消</Button>
+          <Button>提交</Button>
+          <Button onClick={this.props.closeModal}>取消</Button>
         </Modal.Body>
       </Modal>);
   }
@@ -253,8 +259,7 @@ var AccountInfoTab = React.createClass({
 
   getData : function() {
     //TODO ajax获取后台数据
-   /* var ret = {};
-    console.info(this.props);
+    var ret = {};
     $.ajax({
       url : this.props.constants.appCtx + this.props.constants.entInfoUrl,
       type : "post",
@@ -266,8 +271,13 @@ var AccountInfoTab = React.createClass({
         if (data.success) {
           var obj = data.obj;
           ret.packageType = obj.packageuse.userType;   //套餐类型
-
-          console.info(data);
+          ret.authType = obj.accrediation;             //认证状态
+          ret.startTime = obj.packageuse.createTime;
+          ret.endTime = obj.packageuse.expiredTime;
+          ret.maxAgentCount = obj.packageuse.ccTotal;
+          ret.currentAgentCount = obj.packageuse.ccTotal - obj.packageuse.ccOver;
+          ret.consumptionTatol = obj.consumption_total;
+          ret.notBill = obj.consumption_total - obj.consumption_bill;
         } else {
           // TODO 查询失败
           alert(data.msg);
@@ -277,12 +287,14 @@ var AccountInfoTab = React.createClass({
         // TODO 查询失败
         alert("查询企业信息失败！");
       }
-    });*/
+    });
+    console.info(ret);
+
     return {
-      packageType : "0",
-      authType : "0",         //0: 未提交资料， 1：审核中，2：审核失败，3：审核成功
-      startTime : "2016-09-05",
-      endTime : "2016-09-20",
+      packageType : "0",      //1: 试用版  2：企业版   3：标准版  4：基础版
+      authType : "2",         //0: 未提交资料， 1：审核中，2：审核失败，3：审核成功
+      startTime : "2016-09-05",  //套餐开始时间
+      endTime : "2016-09-20",    //套餐结束时间
       currentAgentCount : 1,
       maxAgentCount : 10,
       consumptionTatol : "19600.00",
